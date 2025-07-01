@@ -22,6 +22,7 @@ class Internship extends Model
         'kesbangpol_letter',
         'documentation',
         'contact_person',
+        'accepted',
     ];
 
     public function division()

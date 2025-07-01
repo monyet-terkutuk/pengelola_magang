@@ -5,10 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RequestInternshipController;
 
 // Halaman Utama
 Route::get('/', function () {
-    return view('auth.login');
+    return view('welcome');
 });
 
 
@@ -24,7 +25,12 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 // Routes untuk CRUD Divisions
 Route::resource('divisions', DivisionController::class)->middleware(['auth', 'verified']);
 
-Route::resource('internships', InternshipController::class)->middleware(['auth', 'verified']);
+Route::resource('internships', controller: InternshipController::class)->middleware(['auth', 'verified']);
+Route::resource('request-internship', controller: RequestInternshipController::class);
+
+Route::patch('/request-internship/{id}/accepted', [RequestInternshipController::class, 'accepted'])
+    ->name('request_internship.accepted');
+
 
 // Routes untuk Profile
 Route::middleware('auth')->group(function () {

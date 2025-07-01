@@ -6,24 +6,23 @@ use App\Models\Internship;
 use App\Models\Division;
 use App\Models\Participation;
 use Illuminate\Http\Request;
-
-class InternshipController extends Controller
+class RequestInternshipController extends Controller
 {
-    // Menampilkan semua data Internship
+      // Menampilkan semua data Internship
 public function index()
 {
     $internships = Internship::with('division')
-        ->where('accepted', true) // Hanya mengambil data dengan accepted = true
+        ->where('accepted', false) // Hanya mengambil data dengan accepted = true
         ->get();
 
-    return view('internships.index', compact('internships'));
+    return view('request_internship.index', compact('internships'));
 }
 
     // Menampilkan form untuk membuat Internship baru
     public function create()
     {
         $divisions = Division::all();  // Menampilkan divisi untuk dipilih pada form
-        return view('internships.create', compact('divisions'));
+        return view('request_internship.create', compact('divisions'));
     }
 
      public function show($id)
@@ -32,7 +31,7 @@ public function index()
         $internship = Internship::with('participations')->findOrFail($id);
 
         // Tampilkan halaman detail
-        return view('internships.show', compact('internship'));
+        return view('request_internship.show', compact('internship'));
     }
 
     // Menyimpan Internship baru ke dalam database
@@ -104,19 +103,14 @@ public function store(Request $request)
     }
 
     // Menyimpan Internship baru ke dalam database
-    // $internship = Internship::create(array_merge($request->all(), ['documentation' => $documentation]));
-    $internship = Internship::create(array_merge($request->all(), [
-        'documentation' => $documentation,
-        'accepted' => true // Set accepted menjadi true
-    ]));
-
+    $internship = Internship::create(array_merge($request->all(), ['documentation' => $documentation]));
 
     // Menyimpan peserta-peserta terkait
     foreach ($request->participations as $participation) {
         $internship->participations()->create($participation);  // Pastikan sudah ada relasi "participations" di model Internship
     }
 
-    return redirect()->route('internships.index')
+    return redirect()->route('request_internship.index')
         ->with('success', 'Internship created successfully.');
 }
 
@@ -126,7 +120,7 @@ public function store(Request $request)
     {
         $internship = Internship::findOrFail($id);
         $divisions = Division::all(); // Menampilkan divisi untuk dipilih pada form
-        return view('internships.edit', compact('internship', 'divisions'));
+        return view('request_internship.edit', compact('internship', 'divisions'));
     }
 
         // Menyimpan perubahan Internship
@@ -161,7 +155,7 @@ public function update(Request $request, $id)
         $participation->update($participationData);
     }
 
-    return redirect()->route('internships.index')
+    return redirect()->route('request_internship.index')
         ->with('success', 'Internship updated successfully.');
 }
 
@@ -173,7 +167,20 @@ public function update(Request $request, $id)
         $internship = Internship::findOrFail($id);
         $internship->delete();
 
-        return redirect()->route('internships.index')
+        return redirect()->route('request_internship.index')
             ->with('success', 'Internship deleted successfully.');
     }
+
+
+  public function accepted($id)
+{
+    $internship = Internship::findOrFail($id);
+
+    // Update kolom accepted menjadi true
+    $internship->update(['accepted' => true]);
+
+    return redirect()->route('request_internship.index')
+        ->with('success', 'Internship successfully accepted.');
+}
+
 }
